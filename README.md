@@ -22,6 +22,11 @@ Other users can run `pip install boopackage-1.0.tar.gz` to install your package.
 
 Alternatively, you can [upload your built package to PyPI](https://packaging.python.org/distributing/#uploading-your-project-to-pypi) and then they can install it by running `pip install boopackage`. 
 
+## What are the differences between "Python Packages" and eggs?
+I'm trying to figure that out myself. `build-package.sh` is an example of building "Python Package" and `build-package-egg.sh` is an example of building an egg.
+
+"Python Packages" are documented at https://packaging.python.org/distributing/ and Eggs are documented at http://peak.telecommunity.com/DevCenter/PythonEggs
+
 
 # Troubleshooting #
 ## After installing the package I still see the error 'ImportError: No module named <mypackage>' when trying to use it in a script/app. ##
