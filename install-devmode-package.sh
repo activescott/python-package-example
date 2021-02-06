@@ -1,10 +1,10 @@
 #/bin/bash
-# https://packaging.python.org/distributing/#working-in-development-mode
+# https://packaging.python.org/guides/distributing-packages-using-setuptools/#working-in-development-mode
 pushd .
 cd ./package-project/src/
-pip install -e .
+pip3 install -e ./
 popd
 
-echo; echo
+echo; echo "Showing package info:"
 
-pip show boopackage
+pip3 show boopackage
