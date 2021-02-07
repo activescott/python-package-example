@@ -8,10 +8,13 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  schedule:
+    # monthly cron: https://crontab.guru/monthly
+    - cron: '0 0 1 * *'
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         python-version: [3.7, 3.8, 3.9]
@@ -24,8 +27,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
+          # wheel is  needed for packaging bdist_wheel packaging in build-package.sh
+          python3 -m pip install wheel
+          # update pip just in case I suppose...
           python3 -m pip install --upgrade pip
-          python3 -m pip install flake8 pytest
+          # flake8 used below for lint
+          python3 -m pip install flake8
+          # we don't use requirements to force everything to go to the latest version
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Lint with flake8
         run: |
