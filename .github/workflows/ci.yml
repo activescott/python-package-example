@@ -5,49 +5,53 @@ name: Python package
 
 on:
   push:
-    branches: [ $default-branch ]
+    branches: [master]
   pull_request:
-    branches: [ $default-branch ]
+    branches: [master]
+  schedule:
+    # monthly cron: https://crontab.guru/monthly
+    - cron: '0 0 1 * *'
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        # The goal here is to run on a known good version for a long time and the very latest version of OS/python
+        os: [ubuntu-20.04, macos-10.15, ubuntu-latest, macos-latest]
+        python-version: [3.7, '3.x']
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: build package
-      run: |
-        ./build-package.sh
-    - name: install package
-      run: |
-        ./install-built-package.sh
-    - name: test consuming package
-      run: |
-        ./test-consume-package.sh
-    - name: uninstall package
-      run: |
-        ./uninstall-package.sh
-
-
-
-
-
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          # wheel is  needed for packaging bdist_wheel packaging in build-package.sh
+          python3 -m pip install wheel
+          # update pip just in case I suppose...
+          python3 -m pip install --upgrade pip
+          # flake8 used below for lint
+          python3 -m pip install flake8
+          # we don't use requirements to force everything to go to the latest version
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: build package
+        run: |
+          ./build-package.sh
+      - name: install package
+        run: |
+          ./install-built-package.sh
+      - name: test consuming package
+        run: |
+          ./test-consume-package.sh
+      - name: uninstall package
+        run: |
+          ./uninstall-package.sh
